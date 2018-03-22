@@ -1,0 +1,3 @@
+[submodule "libs/geolocator"]
+	path = libs/geolocator
+	url = git@github.com:cpipilas/google-maps-device-locator.git
