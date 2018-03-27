@@ -1,6 +1,11 @@
 language: bash
 
+git:
+    submodules: false
+
 before_install:
+    - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
+    - git submodule update --init --recursive
     - sudo apt-get update && sudo apt-get install -y make libarchive-zip-perl git gcc-multilib vim
 
 install:
