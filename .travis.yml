@@ -1,0 +1,32 @@
+language: bash
+
+before_install:
+    - sudo apt-get update && sudo apt-get install -y make libarchive-zip-perl git gcc-multilib vim
+
+install:
+    - echo "---> install phase..."
+    - pwd
+    - git clone https://github.com/cpipilas/firmware.git firmware
+    - cd firmware
+    - git checkout release/stable
+    - cd ..
+    - wget https://launchpad.net/gcc-arm-embedded/4.9/4.9-2015-q3-update/+download/gcc-arm-none-eabi-4_9-2015q3-20150921-linux.tar.bz2
+    - tar xjf gcc-arm*.tar.bz2
+    - export PATH=$PATH:/home/travis/build/cpipilas/vehicle-tracking/gcc-arm-none-eabi-4_9-2015q3/bin
+    - arm-none-eabi-gcc --version
+
+before_script:
+    - echo "---> before_script phase..."
+    - mkdir particleGeoLoc && cp -Rf vehicle_tracking.cpp libs particleGeoLoc
+
+script:
+    - echo "---> script phase..."
+    - cd firmware/main
+    - make all PLATFORM=photon APPDIR=../../particleGeoLoc
+    - cd ../../
+
+after_success:
+    - echo "Tests completed successfully!"
+
+after_failure:
+    - echo "Some test cases failed!"
