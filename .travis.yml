@@ -26,9 +26,13 @@ before_script:
 
 script:
     - echo "---> script phase..."
-    - cd firmware/main
-    - make all PLATFORM=photon APPDIR=../../particleGeoLoc
-    - cd ../../
+    - bash build.sh
+    - echo $?
+
+env:
+    matrix:
+        - hw_plat=photon
+        - hw_plat=electron
 
 after_success:
     - echo "Tests completed successfully!"
