@@ -1,41 +1,42 @@
 language: bash
 
 git:
-    submodules: false
+  submodules: false
 
 before_install:
-    - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
-    - git submodule update --init --recursive
-    - sudo apt-get update && sudo apt-get install -y make libarchive-zip-perl git gcc-multilib vim
+- sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
+- git submodule update --init --recursive
+- sudo apt-get update && sudo apt-get install -y make libarchive-zip-perl git gcc-multilib vim
 
 install:
-    - echo "---> install phase..."
-    - pwd
-    - git clone https://github.com/cpipilas/firmware.git firmware
-    - cd firmware
-    - git checkout release/stable
-    - cd ..
-    - wget https://launchpad.net/gcc-arm-embedded/4.9/4.9-2015-q3-update/+download/gcc-arm-none-eabi-4_9-2015q3-20150921-linux.tar.bz2
-    - tar xjf gcc-arm*.tar.bz2
-    - export PATH=$PATH:/home/travis/build/cpipilas/vehicle-tracking/gcc-arm-none-eabi-4_9-2015q3/bin
-    - arm-none-eabi-gcc --version
+- echo "---> install phase..."
+- pwd
+- git clone https://github.com/cpipilas/firmware.git firmware
+- cd firmware
+- git checkout release/stable
+- cd ..
+- wget https://launchpad.net/gcc-arm-embedded/4.9/4.9-2015-q3-update/+download/gcc-arm-none-eabi-4_9-2015q3-20150921-linux.tar.bz2
+- tar xjf gcc-arm*.tar.bz2
+- export PATH=$PATH:/home/travis/build/cpipilas/vehicle-tracking/gcc-arm-none-eabi-4_9-2015q3/bin
+- arm-none-eabi-gcc --version
 
 before_script:
-    - echo "---> before_script phase..."
-    - mkdir particleGeoLoc && cp -Rf vehicle_tracking.cpp libs particleGeoLoc
+- echo "---> before_script phase..."
+- mkdir particleGeoLoc && cp -Rf vehicle_tracking.cpp libs particleGeoLoc
 
 script:
-    - echo "---> script phase..."
-    - bash build.sh
-    - echo $?
+- echo "---> script phase..."
+- bash build.sh
+- bash tests.sh
 
 env:
-    matrix:
-        - hw_plat=photon
-        - hw_plat=electron
+  global:
+  - hw_plat=photon
+  - secure: N7JrvgfltGHWwg5yWfKJ4wKlj1zHDwFjKzD+EPAHIs7Q6S203gOUKoU4RQwrTsvruassdq0AdHCyPrjcI1fEQ77cCy0+cfADvLQYRnc+HF1oxJ3YhofV7/ANtgu+mh7jmKIJ81JECdI3lLLCTl8W5x+hGTD5/juZq6IB6GgbZQXVOxVTQKMioHA+pCdompTha+nmzdMQvQ5k/9VQ3787eAink51VHOmYIMZq6T7wSTwJ4L00y+SjWjwxHXTWGcjTYxLJhPndDuBi3PLHKg4b+45c8qTBvcq3Z//2ZqBD04MTlDyWDXpn3R3ZBIo7Nz+dLxkTSpumIp2wxuxo6wVGpi5Q0+5tDJnxbVjnBTtvPT27zCIzLoeYo0S8OGsXGevMmUIcTVSoTUUi72Ji+JRbsJzG52FaWDhy29IHfw7wKgaJuJx0L2hsVAFdTHzBrlTwPThwf2ygIe0PM65MqVysLRU/KO1q31iMtfoROobhMadpPM82UMv1Hx7I1sXaA4MKsuYuQifbyAyQDqeCLvniPkySEs3kxtd/ydmcXxMgP7tRPVRmI8QMCHVhqEFiOR9x3Z+piVVrEILpD0rg4DyCNsq0m+1bwBWx2TISittdGYtRwWNpkUaJ3/9DGjFgwqeCIeA0mPJitINBUtnWk4eOcGJJsStDoFP0v3bfZGxSJ2c=
+  - secure: RQXwM/uIG9+2D5qcT1TTUMoaflKtK1iFshKsvgcAdUeydWV3jGKQbIKcgHqKREr7kHqcQLIBY2DYjzc5kfFOlZOArTW+9FSLUlHI1sh1uAhPah7ahOiMD3I7qfgvt55tDsPDD5WPTYoLMUULTrF9+wfG08fY/Ybrtx92j98jqKh5ELkfFGMHHIVAblxFdspYFXduMj/OJk7IHoN+GrvUHAgiJdgiNWZu9b/ANg3C6kz9PpRA1lwTAtdM/Xizx2AFn+yohb0WDdzPPR+1Jiw/5LCUzzFpra0ryqonEsZzmICk4Ot3dm/HdC0fWi+XTPROUTf35+/nEfEJ0OlxsxdOh24V44Pp51pOXuOH8gHTOziBvndB6jeg1GlY6EboiBay6Mce7yVsrWqr2YmIGwuIQ7sStea1diUMuDVL2SsdXboB6lg9tWYW/sgy3e+MKb5J4onEWL4JFMfAAaGjWpINPRFgIq8H6ZAf4W1eV4lQhwlSQjw5vQO2gx9Yo1/wjzoo3RCyBF8KU4FDp4aL1Ogiz0fzMx2uu/zsEfLeDWE6O3LqUTyzrvun0+udDvvP/unurTRPQzKHvoJ08hNHPsrOvKCNB7y9lLGvShlQ/hNJ7Fm8xMdUK5fRwEXFHB/Xfk/aVc/Jo2Xb+y3uR4lDEHH0355fXqHTrAQNX1nlPZbzC+k=
 
 after_success:
-    - echo "Tests completed successfully!"
+- echo "Tests completed successfully!"
 
 after_failure:
-    - echo "Some test cases failed!"
+- echo "Some test cases failed!"
