@@ -1,0 +1,44 @@
+variables:
+    GIT_SUBMODULE_STRATEGY: none
+
+before_script:
+    - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
+    - git submodule update --init --recursive
+    - apt-get update && apt-get install -y make libarchive-zip-perl git gcc-multilib vim
+
+
+stages:
+    - build
+    - test
+    - deploy
+
+build:
+    stage: build
+    script:
+        - pwd
+        - git clone https://github.com/cpipilas/firmware.git firmware
+        - cd firmware
+        - git checkout release/stable
+        - cd ..
+        - wget https://launchpad.net/gcc-arm-embedded/4.9/4.9-2015-q3-update/+download/gcc-arm-none-eabi-4_9-2015q3-20150921-linux.tar.bz2
+        - tar xjf gcc-arm*.tar.bz2
+        - export PATH=$PATH:/builds/cpipilas/vehicle-tracking/gcc-arm-none-eabi-4_9-2015q3/bin
+        - arm-none-eabi-gcc --version
+        - mkdir particleGeoLoc && cp -Rf vehicle_tracking.cpp libs particleGeoLoc
+        - cd firmware/main
+        - make all PLATFORM=photon APPDIR=../../particleGeoLoc
+        - cd ../../
+    artifacts:
+        paths:
+            - firmware/modules/particleGeoLoc/target
+            - firmware/modules/particleGeoLoc/target/particleGeoLoc.bin
+
+.ota_update:
+    stage: test
+    dependencies:
+        - build
+    script:
+        # ota update
+        - curl -X PUT "https://api.particle.io/v1/devices/25001c001347343438323536?access_token=9f9d7874f34b93011193c8f09f6cfb3c09161851" -F file=@firmware/modules/particleGeoLoc/target/particleGeoLoc.bin -F file_type=binary
+        # ping device
+        - curl https://api.particle.io/v1/devices/25001c001347343438323536/ping -X PUT -d access_token=9f9d7874f34b93011193c8f09f6cfb3c09161851
