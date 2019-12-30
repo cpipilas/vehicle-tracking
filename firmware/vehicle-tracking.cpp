@@ -11,7 +11,7 @@ GoogleMapsDeviceLocator locator;
 
 void setup() {
   Serial.begin(9600);
-  // Issue a Wi-Fi scan request and send the results to the cloud every 30 secs
+  // Issue a Wi-Fi probe request and send the results to the cloud every 30 secs
   locator.withLocatePeriodic(30);
 }
 
